@@ -59,3 +59,4 @@ def load_DNNClassifier(model_dir =
             model_dir = model_dir)
     
     return dnn_classifier
+
