@@ -28,7 +28,7 @@ the API needs to be luanched before accessed.
 
 ### Launch API
 
-Luanch API with the following command line after navigating to 'src' folder:
+Luanch API with the following command line after navigating to **'src'** folder:
 
 ```
 $ python api.py [--classifier CLASSIFIER] [--host HOST] [--port PORT]
@@ -44,7 +44,7 @@ With arguments:
 
 ### Access API
 
-Access API on 'HOST:PORT/judge' using HTTP GET Method, with all 5 statistics (features) as query parameters.
+Access API on **'HOST:PORT/judge'** using HTTP GET Method, with all 5 statistics (features) as query parameters.
 
 Author features and predicted label are returned in JSON format.
 
