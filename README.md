@@ -1,38 +1,50 @@
-# Student Identity API
+# Student Identity Judgement API
 
-A prototype API for judging student identity of authors.
+An API for judging student identity of authors.
 
-## Getting Started
+## Requirements
 
-These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. See deployment for notes on how to deploy the project on a live system.
-
-### Prerequisites
-
-What things you need to install the software and how to install them
+The following environment or packages need to be properly installed.
 
 ```
 Python >= 3.6
-Tensorflow >= 1.10.0
 Flask >= 1.0.2
+Tensorflow >= 1.10.0
 Pandas >= 0.23.4
 Numpy >= 1.15.2
 ```
 
 ## Usage
 
-Explain how to run the automated tests for this system
+To judge the student identity of a certain author, 5 statistics are needed:
+* pc: total number of publications;
+* cn: total number of citations;
+* hi: H-index;
+* gi: G-index;
+* year_range: time range from the first to the last publication. 
+    *  *year_range = year of latest publication - year of earlist publication + 1*
 
-### Break down into end to end tests
+the API needs to be luanched before accessed.
 
-Explain what these tests test and why
+### Launch API
+
+Luanch API with the following command line after navigating to 'src' folder:
 
 ```
-Give an example
+$ python api.py [--classifier CLASSIFIER] [--host HOST] [--port PORT]
 ```
 
-### And coding style tests
+With arguments:
 
-Explain what these tests test and why
+```
+--classifier    Choose which classifier to use, dnn_classifier or linear_classifier, default dnn_classifier.
+--host          Host url of API, default localhost.
+--port          Port of the host API used, defulat 5000.
+```
+
+### Access API
+
+Access API using GET Method.
 
 ```
 Give an example
@@ -40,5 +52,9 @@ Give an example
 
 ## Authors
 
-* **Junlin Song** - *Initial work*
+* **Junlin Song** - *Initial work* - [julius-song](https://github.com/julius-song)
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
