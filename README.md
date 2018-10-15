@@ -16,7 +16,7 @@ Numpy >= 1.15.2
 
 ## Usage
 
-To judge the student identity of a certain author, 5 statistics are needed:
+To judge the student identity of a certain author, 5 statistics (features) are needed:
 * pc: total number of publications;
 * cn: total number of citations;
 * hi: H-index;
@@ -44,10 +44,38 @@ With arguments:
 
 ### Access API
 
-Access API using GET Method.
+Access API on 'HOST:PORT/judge' using HTTP GET Method, with all 5 statistics (features) as query parameters.
+
+Author features and predicted label are returned in JSON format.
+
+'label' = 1 if author is predicted as student, otherwise label = 0 if predicted as non-student.
+
+Examples:
 
 ```
-Give an example
+import requests
+
+url = 'http://127.0.0.1:5000/judge'
+parameters = {'pc': 303, 'cn': 11111, 'hi': 55, 'gi': 99, 'year_range': 20}
+
+response = requests.get(url, params = parameters)
+
+print(response.text)
+```
+
+Results:
+
+```
+{
+  "features": {
+    "cn": 11111, 
+    "gi": 99, 
+    "hi": 55, 
+    "pc": 303, 
+    "year_range": 20
+  }, 
+  "label": 0
+}
 ```
 
 ## Authors
