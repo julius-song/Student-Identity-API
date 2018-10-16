@@ -131,7 +131,13 @@ def launch_api(classifier_name, host, port):
         
         # Integrate different DataFrames into one called results_df.
         results_df = pd.DataFrame()
-        results_df['id'] = features['id']
+        
+        # If id available.
+        try:
+            results_df['id'] = features['id']
+        except:
+            pass
+        
         results_df['label'] = pd.Series(labels)
         results_df['probabilies'] = pd.Series(probabilities)
         
