@@ -152,7 +152,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     
     parser.add_argument('--classifier', type = str, default = 'dnn_classifier', 
-                        help = 'Choose which classifier to use, dnn_classifier or linear_classifier, default dnn_classifir.')
+                        help = 'Choose which classifier to use, dnn_classifier or linear_classifier, default dnn_classifier.')
     parser.add_argument('--host', type = str, default = '127.0.0.1', 
                         help = 'host url of api, default localhost.')
     parser.add_argument('--port', type = int, default = 5000, 
