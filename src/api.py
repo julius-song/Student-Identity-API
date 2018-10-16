@@ -7,7 +7,7 @@ Created on Sat Oct 13 16:47:25 2018
 """
 
 import flask
-from flask import request, jsonify
+from flask import request
 
 import tensorflow as tf
 import pandas as pd
@@ -16,6 +16,7 @@ from tensorflow.python.data import Dataset
 import math
 
 import argparse
+import json
 
 import load_model
 
@@ -27,7 +28,7 @@ def my_input_fn(features):
         features: A pandas DataFrame of features
       
     Returns:
-        Normalized feature of input.
+        Normalized features of input.
     """
 
     # 53 is the max year_range in training set.
@@ -57,18 +58,20 @@ def parse(classifier, features):
   
     Args:
         classifier: a trained linear or nn classifier object for predictions.
-        features: pandas DataFrame of features
+        features: pandas DataFrame of features.
       
     Returns:
-        An 'int' of predicted label
+        pred_class_id: A 'list' of predicted label as 'int'.
+        probabilities: A 'list' of prediction probabilities as 'float32'.
     """
    
     prediction_input_fn = lambda: my_input_fn(features)
     
-    predictions = classifier.predict(input_fn = prediction_input_fn)
-    pred_class_id = np.array([item['class_ids'][0] for item in predictions])[0]
+    predictions = list(classifier.predict(input_fn = prediction_input_fn))
+    pred_class_id = [int(item['class_ids'][0]) for item in predictions]
+    probabilities = [item['probabilities'][item['class_ids'][0]] for item in predictions]
 
-    return int(pred_class_id)
+    return pred_class_id, probabilities
 
 
 def launch_api(classifier_name, host, port):
@@ -80,6 +83,7 @@ def launch_api(classifier_name, host, port):
         port: An 'int', the port of the host api used.
     '''
     
+    # Choose which classifier to use.
     if classifier_name == 'dnn_classifier':
         classifier = load_model.load_DNNClassifier()
     elif classifier_name == 'linear_classifier':
@@ -87,51 +91,57 @@ def launch_api(classifier_name, host, port):
     else:
         return print('No model matched. Choose one between \'dnn_classifier\' and \'linear_classifier\'.')
 
-    api = flask.Flask(__name__)
-    api.config["DEBUG"] = True
+    # Launch api.
+    app = flask.Flask(__name__)
+    app.config["DEBUG"] = True
 
-    @api.route('/', methods = ['GET'])
+    @app.route('/', methods = ['GET'])
     def home():
         return '''
                 <h1>Student Identity Judgement</h1>
-                <p>A prototype API for judging student identity of authors.</p>
-                <p>Go to '/judge' with the following query parameters: 
-                    <br>&emsp;pc, total number of publications
-                    <br>&emsp;cn, total number of citations
-                    <br>&emsp;hi, h-index
-                    <br>&emsp;gi, g-index
-                    <br>&emsp;year_range, time range from the first to the last publication</p>
+                <p>An API for judging student identity of authors.</p>
+                <p>POST to '/judge' with the following parameters in JSON format: 
+                    <br>&emsp;<b>pc</b>: total number of publications
+                    <br>&emsp;<b>cn</b>: total number of citations
+                    <br>&emsp;<b>hi</b>: h-index
+                    <br>&emsp;<b>gi</b>: g-index
+                    <br>&emsp;<b>year_range</b>: time range from the first to the last publication
+                    <br>&emsp;<b>id</b> <i>(optional)</i>: id of authors</p>
                 '''
         
-    @api.errorhandler(404)
+    @app.errorhandler(404)
     def page_not_found(e):
         return '<h1>404</h1><p>The resource could not be found.</p>', 404
 
-    @api.route('/judge', methods = ['GET'])
+    @app.route('/judge', methods = ['POST'])
     def judge():
         
-        features = pd.DataFrame(columns = ['pc', 'cn', 'hi','gi', 'year_range'])
+        request_data = request.get_json()
         
-        query_parameters = request.args
+        try:
+            features = pd.read_json(json.dumps(request_data))
+        except:
+            return '''
+                <h1>Incomplete Query Parameters</h1>
+                <p>Five parameters are needed for judging student identity, 
+                    at least one is missing.</p>
+                '''
         
-        for feature in ['pc', 'cn', 'hi', 'gi', 'year_range']:
-            if feature in query_parameters:
-                features[feature] = pd.Series(int(query_parameters.get(feature)))
-            else:
-                return '''
-                        <h1>Incomplete Query Parameters</h1>
-                        <p>Five parameters are needed for judging student identity, 
-                            at least one is missing.</p>
-                        '''
+        labels, probabilities = parse(classifier, features)
         
-        label = parse(classifier, features)
+        # Integrate different DataFrames into one called results_df.
+        results_df = pd.DataFrame()
+        results_df['id'] = features['id']
+        results_df['label'] = pd.Series(labels)
+        results_df['probabilies'] = pd.Series(probabilities)
+        
+        results = json.dumps(json.loads(
+                                    results_df.to_json(orient = 'records')),
+                             indent = 4)
+        
+        return results
     
-        features = {key: int(value) for key, value in dict(features).items()}
-        result = {'features': features, 'label': label}
-        
-        return jsonify(result)
-    
-    api.run(host = host, port = port)
+    app.run(host = host, port = port)
     
     
 if __name__ == '__main__':
@@ -142,7 +152,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     
     parser.add_argument('--classifier', type = str, default = 'dnn_classifier', 
-                        help = 'Choose which classifier to use, dnn_classifier or linear_classifier.')
+                        help = 'Choose which classifier to use, dnn_classifier or linear_classifier, default dnn_classifir.')
     parser.add_argument('--host', type = str, default = '127.0.0.1', 
                         help = 'host url of api, default localhost.')
     parser.add_argument('--port', type = int, default = 5000, 

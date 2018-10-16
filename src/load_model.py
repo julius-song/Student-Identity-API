@@ -15,7 +15,7 @@ def construct_feature_columns():
     """Construct the TensorFlow Feature Columns.
     
     Returns:
-        A set of feature columns
+        A set of feature columns.
     """ 
     
     return set([tf.feature_column.numeric_column(my_feature) 
