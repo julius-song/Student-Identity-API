@@ -139,7 +139,7 @@ def launch_api(classifier_name, host, port):
             pass
         
         results_df['label'] = pd.Series(labels)
-        results_df['probabilies'] = pd.Series(probabilities)
+        results_df['probability'] = pd.Series(probabilities)
         
         results = json.dumps(json.loads(
                                     results_df.to_json(orient = 'records')),
