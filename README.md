@@ -24,7 +24,10 @@ To judge the student identity of a certain author, 5 statistics (features) are n
 * year_range: time range from the first to the last publication. 
     *  *year_range = year of latest publication - year of earlist publication + 1*
 
-the API needs to be luanched before accessed.
+In order to index authors conviently, an optional argument can be added:
+* id: id of authors.
+
+The API needs to be luanched before accessed.
 
 ### Launch API
 
@@ -44,21 +47,21 @@ With arguments:
 
 ### Access API
 
-Access API on **'HOST:PORT/judge'** using HTTP GET Method, with all 5 statistics (features) as query parameters.
+Access API on **'HOST:PORT/judge'** using HTTP **POST** Method, with all 5 statistics (features) as payload in JSON format. (*id* can be added.)
 
-Author features and predicted label are returned in JSON format.
+Predicted label, probabilities of prediction *(and id if available)* are returned in JSON format.
 
 'label' = 1 if author is predicted as student, otherwise label = 0 if predicted as non-student.
 
-Examples:
+Examples 1: (Requests >= 2.19.1)
 
 ```
 import requests
 
 url = 'http://127.0.0.1:5000/judge'
-parameters = {'pc': 303, 'cn': 11111, 'hi': 55, 'gi': 99, 'year_range': 20}
+payload = [{'pc': 303, 'cn': 11111, 'hi': 55, 'gi': 99, 'year_range': 20}]
 
-response = requests.get(url, params = parameters)
+response = requests.post(url, json = payload)
 
 print(response.text)
 ```
@@ -66,16 +69,43 @@ print(response.text)
 Results:
 
 ```
-{
-  "features": {
-    "cn": 11111, 
-    "gi": 99, 
-    "hi": 55, 
-    "pc": 303, 
-    "year_range": 20
-  }, 
-  "label": 0
-}
+[
+    {
+        "label": 0,
+        "probability": 0.999997735
+    }
+]
+```
+
+Examples 2:
+
+```
+import requests
+
+url = 'http://127.0.0.1:5000/judge'
+payload = [{'id': 0, 'pc': 16, 'cn': 1788, 'hi': 13, 'gi': 16, 'year_range': 9}, 
+           {'id': 1, 'pc': 9, 'cn': 579, 'hi': 5, 'gi': 9, 'year_range': 8}]
+
+response = requests.post(url, json = payload)
+
+print(response.text)
+```
+
+Results:
+
+```
+[
+    {
+        "id": 0,
+        "label": 1,
+        "probability": 0.5169955492
+    },
+    {
+        "id": 1,
+        "label": 1,
+        "probability": 0.9957641363
+    }
+]
 ```
 
 ## Authors
