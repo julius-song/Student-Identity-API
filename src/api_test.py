@@ -193,6 +193,13 @@ def launch_api(classifier_name, host, port):
         
         return json.dumps(results, indent = 4)
 
+    @app.route('/model_dir', methods = ['GET'])
+    def model_dir():
+        
+        results = {'model_dir': classifier.model_dir}
+        
+        return json.dumps(results, indent = 4)
+    
     app.run(host = host, port = port)
     
     
