@@ -34,6 +34,9 @@ def load_LinearClassifier(model_dir =
         A trained LinearClassifier object.
     '''
     
+    if os.path.isdir(model_dir) == False:
+        return print('Could not load model from dir \'{}\''.format(model_dir))
+    
     linear_classifier = tf.estimator.LinearClassifier(
             feature_columns = construct_feature_columns(),
             model_dir = model_dir)
@@ -52,6 +55,9 @@ def load_DNNClassifier(model_dir =
     Returns:
         A trained DNNClassifier object.
     '''
+    
+    if os.path.isdir(model_dir) == False:
+        return print('Could not load model from dir \'{}\''.format(model_dir))
     
     dnn_classifier = tf.estimator.DNNClassifier(
             hidden_units = [10, 10],
