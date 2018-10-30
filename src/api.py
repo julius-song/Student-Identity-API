@@ -95,6 +95,14 @@ def launch_api(classifier_name, host, port):
     app = flask.Flask(__name__)
     app.config["DEBUG"] = True
 
+    @app.after_request
+    def after_request(response):
+        response.headers.add('Access-Control-Allow-Origin', '*')
+        response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
+        response.headers.add('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS')
+        response.headers.add('Access-Control-Allow-Credentials', 'true')
+        return response
+    
     @app.route('/', methods = ['GET'])
     def home():
         return '''
