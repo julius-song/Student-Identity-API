@@ -1,6 +1,8 @@
 # Student Identity Judgement API
 
-An API for judging student identity of authors.
+An API for judging student identity of authors, based on [previous work](https://github.com/julius-song/Student-Identity-Classifier).
+
+This work is implmented in [aminer.org](https://www.aminer.org), an online researcher social network, under guidance of Prof. [Jie Tang](http://keg.cs.tsinghua.edu.cn/jietang/) from Tsinghua University, China.
 
 ## Requirements
 
